@@ -34,42 +34,79 @@
         </div>
 
         <!-- RIGHT COLUMN: Address, PIN, and Sender Details -->
-        <div class="w-full space-y-2 pt-4 md:w-1/2 md:border-l-2 md:border-gray-400 md:pt-0 md:pl-6">
+        <form class="w-full space-y-2 pt-4 md:w-1/2 md:border-l-2 md:border-gray-400 md:pt-0 md:pl-6">
           
           <h2 class="text-base font-semibold text-gray-700 border-b border-gray-400 pb-1">Recipient Address:</h2>
 
           <div class="space-y-2">
-            <input type="text" placeholder="Name/C/O" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
-            <input type="text" placeholder="House No./Street/Village" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
-            <input type="text" placeholder="Post Office/District" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
-            <input type="text" placeholder="State" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
+            <input type="text" name="recipient_name" placeholder="Name/C/O" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
+            <input type="text" name="recipient_address" placeholder="House No./Street/Village" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
+            <input type="text" name="recipient_po" placeholder="Post Office/District" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
+            <input type="text" name="recipient_state" placeholder="State" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
           </div>
 
           <!-- PIN Code Input Block -->
           <div class="pt-2">
             <label class="mb-1 block text-xs font-semibold text-red-700">PIN CODE</label>
             <div class="flex justify-start space-x-1">
-              <input type="text" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
-              <input type="text" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
-              <input type="text" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
-              <input type="text" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
-              <input type="text" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
-              <input type="text" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
+              <input type="text" name="pin_1" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
+              <input type="text" name="pin_2" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
+              <input type="text" name="pin_3" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
+              <input type="text" name="pin_4" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
+              <input type="text" name="pin_5" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
+              <input type="text" name="pin_6" maxlength="1" pattern="[0-9]" title="Enter one digit" required class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-amber-800 focus:outline-none" />
             </div>
           </div>
           
           <!-- Sender Name Input -->
           <div class="pt-2">
             <p class="mb-1 block text-xs font-semibold text-gray-700">Sender's Name:</p>
-            <input type="text" placeholder="Your Full Name" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
+            <input type="text" name="sender_name" placeholder="Your Full Name" class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none" />
           </div>
 
           <!-- Post Button -->
           <div class="pt-2">
-            <button class="w-full border-2 border-dotted border-gray-500 py-2 font-bold tracking-wider text-gray-700 uppercase transition duration-200 hover:border-amber-800 hover:text-amber-800">Post</button>
+            <button type="submit" class="w-full border-2 border-dotted border-gray-500 py-2 font-bold tracking-wider text-gray-700 uppercase transition duration-200 hover:border-amber-800 hover:text-amber-800">Post</button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
+    <script>
+      const form = document.querySelector('form');
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        
+        const pin = Array.from(formData.entries())
+          .filter(([key]) => key.startsWith('pin_'))
+          .map(([, value]) => value)
+          .join('');
+
+        const data = {
+          recipient_name: formData.get('recipient_name'),
+          recipient_address: formData.get('recipient_address'),
+          recipient_po: formData.get('recipient_po'),
+          recipient_state: formData.get('recipient_state'),
+          sender_name: formData.get('sender_name'),
+          pin: pin,
+        };
+
+        try {
+          const response = await fetch('/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+          const result = await response.text();
+          console.log(result);
+          alert('Data submitted successfully!');
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          alert('Error submitting data. Please try again.');
+        }
+      });
+    </script>
   </body>
 </html>
