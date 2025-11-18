@@ -166,7 +166,7 @@ serve(async (req, conn) => {
     }
 
     try {
-      const iter = kv.list({ prefix: ["ip"] });
+      const iter = kv.list({ prefix: ["rate_limit"] });
       for await (const res of iter) {
         await kv.delete(res.key);
       }
