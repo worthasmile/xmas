@@ -7,6 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="m-0 flex h-full items-center justify-center bg-gray-100 p-0">
+    <div id="toast" class="fixed top-5 right-5 p-4 rounded-md text-white transition-opacity duration-300 opacity-0 z-50 bg-gray-800">
+      <p id="toast-message"></p>
+    </div>
     <!-- Postcard Container: Increased max-width for two columns -->
     <div
       class="postcard-container w-full max-w-4xl border-dotted border-amber-800 bg-yellow-100 p-4 font-serif shadow-2xl sm:p-6 md:p-8"
@@ -59,24 +62,28 @@
               type="text"
               name="recipient_name"
               placeholder="Full Name"
+              required
               class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none"
             />
             <input
               type="text"
               name="recipient_address_1"
               placeholder="Address Line 1"
+              required
               class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none"
             />
             <input
               type="text"
               name="recipient_address_2"
               placeholder="Address Line 2"
+              required
               class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none"
             />
             <input
               type="text"
               name="recipient_state"
               placeholder="State"
+              required
               class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none"
             />
           </div>
@@ -152,6 +159,7 @@
               type="text"
               name="sender_name"
               placeholder="Your Full Name"
+              required
               class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-amber-800 focus:outline-none"
             />
           </div>
@@ -171,6 +179,41 @@
     <script>
       const form = document.querySelector("form");
       const submitButton = form.querySelector('button[type="submit"]');
+      const pinInputs = form.querySelectorAll('input[name^="pin_"]');
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toast-message");
+
+      function showToast(message, type = "success") {
+        toastMessage.textContent = message;
+        toast.classList.remove("bg-green-500", "bg-red-500", "bg-gray-800");
+        if (type === "success") {
+          toast.classList.add("bg-green-500");
+        } else {
+          toast.classList.add("bg-red-500");
+        }
+        toast.style.opacity = 1;
+        setTimeout(() => {
+          toast.style.opacity = 0;
+        }, 5000);
+      }
+
+      pinInputs.forEach((input, index) => {
+        input.addEventListener("input", (event) => {
+          if (event.target.value.length === 1) {
+            if (index < pinInputs.length - 1) {
+              pinInputs[index + 1].focus();
+            }
+          }
+        });
+
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Backspace" && event.target.value.length === 0) {
+            if (index > 0) {
+              pinInputs[index - 1].focus();
+            }
+          }
+        });
+      });
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -203,18 +246,18 @@
           });
 
           if (response.status === 429) {
-            alert("You have submitted too many times. Please try again later.");
+            showToast("You have submitted too many times. Please try again later.", "error");
           } else if (response.ok) {
             const result = await response.json();
             console.log(result);
-            alert("Data submitted successfully!");
+            showToast("We have informed santa about your postcard!");
             form.reset();
           } else {
             throw new Error("An unknown error occurred.");
           }
         } catch (error) {
           console.error("Error submitting form:", error);
-          alert("Error submitting data. Please try again.");
+          showToast("Our Santa is busy with some Xmas activities. Please try again.", "error");
         } finally {
           submitButton.disabled = false;
           submitButton.textContent = "Post";
