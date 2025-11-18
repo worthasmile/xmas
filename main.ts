@@ -5,7 +5,7 @@ const NOTION_DATABASE_ID = Deno.env.get("NOTION_DATABASE_ID");
 
 const kv = await Deno.openKv();
 
-serve(async (req) => {
+serve(async (req, conn) => {
   const url = new URL(req.url);
   if (url.pathname === "/xmas" && req.method === "GET") {
     try {
@@ -35,6 +35,14 @@ serve(async (req) => {
 
   if (url.pathname === "/" && req.method === "POST") {
     try {
+      const ip = (conn.remoteAddr as Deno.NetAddr).hostname;
+      const ipKey = ["rate_limit", ip];
+      let ipCount = (await kv.get<number>(ipKey)).value ?? 0;
+
+      if (ipCount >= 5) {
+        return new Response("Too Many Requests", { status: 429 });
+      }
+
       const data = await req.json();
 
       // Store data in Notion
@@ -102,12 +110,16 @@ serve(async (req) => {
           rich_text: [
             {
               text: {
-                content: "123.123.123.123",
+                content: ip,
               },
             },
           ],
         },
       });
+
+      // Increment IP quota count
+      ipCount++;
+      await kv.set(ipKey, ipCount);
 
       // Store submission count in Deno KV
       const countKey = ["submissions_count"];
