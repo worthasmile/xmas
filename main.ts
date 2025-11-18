@@ -5,6 +5,13 @@ const NOTION_DATABASE_ID = Deno.env.get("NOTION_DATABASE_ID");
 
 const kv = await Deno.openKv();
 
+const ADMIN_USERNAME = Deno.env.get("ADMIN_USERNAME");
+const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD");
+
+if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+  console.error("ADMIN_USERNAME and ADMIN_PASSWORD must be set as environment variables.");
+}
+
 serve(async (req, conn) => {
   const url = new URL(req.url);
   if (url.pathname === "/xmas" && req.method === "GET") {
@@ -67,7 +74,7 @@ serve(async (req, conn) => {
         },
         "Recipient Address Line 2": {
           rich_text: [
-            {
+            { 
               text: {
                 content: data.recipient_address_2 || "N/A",
               },
@@ -117,7 +124,7 @@ serve(async (req, conn) => {
         },
       });
 
-      // Increment IP quota count
+      // Increment IP count
       ipCount++;
       await kv.set(ipKey, ipCount);
 
@@ -127,7 +134,7 @@ serve(async (req, conn) => {
       count++;
       await kv.set(countKey, count);
 
-      console.log("New submission:", data);
+      console.log(`New submission: ${ipCount}`, data);
 
       return new Response(JSON.stringify({ totalSubmissions: count }), {
         headers: { "Content-Type": "application/json" },
@@ -135,6 +142,37 @@ serve(async (req, conn) => {
       });
     } catch (error) {
       console.error("Error processing form data:", error);
+      return new Response("Internal Server Error", { status: 500 });
+    }
+  }
+
+  if (url.pathname === "/xmas/reset-rate-limit" && req.method === "GET") {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Basic ")) {
+      return new Response("Unauthorized", {
+        status: 401,
+        headers: { "WWW-Authenticate": 'Basic realm="Xmas App"' },
+      });
+    }
+
+    const decodedCreds = atob(authHeader.substring(6));
+    const [username, password] = decodedCreds.split(":");
+
+    if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+      return new Response("Unauthorized", {
+        status: 401,
+        headers: { "WWW-Authenticate": 'Basic realm="Xmas App"' },
+      });
+    }
+
+    try {
+      const iter = kv.list({ prefix: ["ip"] });
+      for await (const res of iter) {
+        await kv.delete(res.key);
+      }
+      return new Response("Rate limits for all IPs have been reset.", { status: 200 });
+    } catch (error) {
+      console.error("Error resetting rate limits:", error);
       return new Response("Internal Server Error", { status: 500 });
     }
   }
