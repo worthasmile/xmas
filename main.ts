@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { getConnInfo } from "hono/deno";
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
-
 import { createNotionPage, queryNotionDatabase } from "./notion.ts";
+import { RATE_LIMIT } from "./rate-limits.ts";
 
 const NOTION_DATABASE_ID = Deno.env.get("NOTION_DATABASE_ID");
 
@@ -29,7 +29,7 @@ app.get(
 // Handle form submission
 app.post("/api/xmas-cards", async (c) => {
   try {
-    const ip = c.req.header("x-forwarded-for") || "unknown";
+    const ip = getConnInfo(c)?.remote?.address || "unknown";
     await rateLimitValidation(c, "xmas_postcard_submissions");
 
     const data = await c.req.json();
@@ -136,7 +136,7 @@ app.get("/xmas/stats", async (c) => {
 });
 
 // Reset rate limit
-app.get("/xmas/reset-rate-limit", async (c) => {
+app.get("/api/xmas/reset-rate-limit", async (c) => {
   await validateBasicAuth(c);
 
   try {
@@ -161,16 +161,16 @@ async function incrementTrackerCount(trackerKey: string[]): Promise<number> {
 }
 
 async function rateLimitValidation(c, actionKey: string) {
+  console.log("Performing rate limit validation...");
   const ip = getConnInfo(c)?.remote?.address || "unknown";
-  console.log(`Rate limit check for IP: ${ip}`);
   const rateLimitKey = ["rate_limit", actionKey, ip];
   let rateLimitUsage = (await kv.get<number>(rateLimitKey)).value ?? 0;
-
-  if (rateLimitUsage >= 5) {
+  console.log(`Current rate limit usage for ${ip}: ${rateLimitUsage}/${RATE_LIMIT[actionKey]}`);
+  if (rateLimitUsage >= RATE_LIMIT[actionKey]) {
+    console.log(`Rate limit exceeded for IP: ${ip}`);
     return c.text("Too Many Requests", 429);
   }
 
-  // Increment IP count
   rateLimitUsage++;
 
   await kv.set(rateLimitKey, rateLimitUsage);
