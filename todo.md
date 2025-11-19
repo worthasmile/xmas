@@ -1,8 +1,19 @@
 #TODO
 - [x] Convert state input to dropdown
-- [ ] OG tags
+- [x] OG tags
 - [x] Custom 404 page
 - [ ] Fix blog URL
 - [x] Use rate limit validation as a middleware
 - [x] Use basic auth validation as a middleware
 - [ ] Use minimal tailwind css instead of entire tailwind css load
+- [ ] Add about page
+  - [ ] What are we doing and why are we doing this
+  - [ ] How it started
+  - [ ] Tech behind this
+  - [ ] How data is handled
+  - [ ] Who all are involved
+- [ ] Add share button
+- [ ] Add stats UI page
+- [ ] Fix trailing / issue
+- [ ] Add loading overlay
+- [ ] Inform the chance for getting it delivered
