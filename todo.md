@@ -3,5 +3,5 @@
 - [ ] OG tags
 - [ ] Custom 404 page
 - [ ] Fix blog URL
-- [ ] Use rate limit validation as a middleware
-- [ ] Use basic auth validation as a middleware
+- [x] Use rate limit validation as a middleware
+- [x] Use basic auth validation as a middleware

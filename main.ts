@@ -2,16 +2,14 @@ import { Hono } from "hono";
 import { getConnInfo } from "hono/deno";
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { createNotionPage, queryNotionDatabase } from "./notion.ts";
-import { RATE_LIMIT } from "./rate-limits.ts";
+import { rateLimitValidation } from "./middlewares/rate-limit-middleware.ts";
+import { validateBasicAuth } from "./middlewares/basic-auth-middleware.ts";
 
 const NOTION_DATABASE_ID = Deno.env.get("NOTION_DATABASE_ID");
 
 const kv = await Deno.openKv();
 
-const ADMIN_USERNAME = Deno.env.get("ADMIN_USERNAME");
-const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD");
-
-if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+if (!Deno.env.get("ADMIN_USERNAME") || !Deno.env.get("ADMIN_PASSWORD")) {
   console.error(
     "ADMIN_USERNAME and ADMIN_PASSWORD must be set as environment variables.",
   );
@@ -27,10 +25,9 @@ app.get(
 );
 
 // Handle form submission
-app.post("/api/xmas-cards", async (c) => {
+app.post("/api/xmas-cards", rateLimitValidation("xmas_postcard_submissions"), async (c) => {
   try {
     const ip = getConnInfo(c)?.remote?.address || "unknown";
-    await rateLimitValidation(c, "xmas_postcard_submissions");
 
     const data = await c.req.json();
 
@@ -118,9 +115,7 @@ app.post("/api/xmas-cards", async (c) => {
   }
 });
 
-app.get("/xmas/stats", async (c) => {
-  await validateBasicAuth(c);
-
+app.get("/xmas/stats", validateBasicAuth, async (c) => {
   try {
     const notionData = await queryNotionDatabase(NOTION_DATABASE_ID);
     const count = notionData.results.length;
@@ -136,9 +131,7 @@ app.get("/xmas/stats", async (c) => {
 });
 
 // Reset rate limit
-app.get("/api/xmas/reset-rate-limit", async (c) => {
-  await validateBasicAuth(c);
-
+app.get("/api/xmas/reset-rate-limit", validateBasicAuth, async (c) => {
   try {
     const iter = kv.list({ prefix: ["rate_limit"] });
 
@@ -158,41 +151,6 @@ async function incrementTrackerCount(trackerKey: string[]): Promise<number> {
   await kv.set(trackerKey, newCount);
 
   return newCount;
-}
-
-async function rateLimitValidation(c, actionKey: string) {
-  console.log("Performing rate limit validation...");
-  const ip = getConnInfo(c)?.remote?.address || "unknown";
-  const rateLimitKey = ["rate_limit", actionKey, ip];
-  let rateLimitUsage = (await kv.get<number>(rateLimitKey)).value ?? 0;
-  console.log(`Current rate limit usage for ${ip}: ${rateLimitUsage}/${RATE_LIMIT[actionKey]}`);
-  if (rateLimitUsage >= RATE_LIMIT[actionKey]) {
-    console.log(`Rate limit exceeded for IP: ${ip}`);
-    return c.text("Too Many Requests", 429);
-  }
-
-  rateLimitUsage++;
-
-  await kv.set(rateLimitKey, rateLimitUsage);
-}
-
-async function validateBasicAuth(c) {
-  const authHeader = c.req.header("authorization");
-
-  if (!authHeader || !authHeader.startsWith("Basic ")) {
-    return c.text("Unauthorized", 401, {
-      "WWW-Authenticate": 'Basic realm="Worth A Smile"',
-    });
-  }
-
-  const decodedCreds = atob(authHeader.substring(6));
-  const [username, password] = decodedCreds.split(":");
-
-  if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-    return c.text("Unauthorized", 401, {
-      "WWW-Authenticate": 'Basic realm="Worth A Smile"',
-    });
-  }
 }
 
 serve(app.fetch);
