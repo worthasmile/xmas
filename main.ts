@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { getConnInfo } from "hono/deno";
+import { getConnInfo, serveStatic } from "hono/deno";
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { createNotionPage, queryNotionDatabase } from "./notion.ts";
 import { rateLimitValidation } from "./middlewares/rate-limit-middleware.ts";
@@ -16,8 +16,8 @@ if (!Deno.env.get("ADMIN_USERNAME") || !Deno.env.get("ADMIN_PASSWORD")) {
 }
 
 const app = new Hono();
-
 // Serve static files
+app.use('/assets/*', serveStatic({ root: './public' }));
 app.get("/xmas", (c) => c.html(Deno.readTextFileSync("index.html")));
 app.get(
   "/xmas/santa-stamp-150-200.png",
@@ -145,7 +145,6 @@ app.get("/api/xmas/reset-rate-limit", validateBasicAuth, async (c) => {
     return c.text("Internal Server Error", 500);
   }
 });
-
 app.notFound((c) => {
   return c.html(Deno.readTextFileSync("404.html"), 404);
 });
