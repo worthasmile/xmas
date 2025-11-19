@@ -4,6 +4,7 @@ import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { createNotionPage, queryNotionDatabase } from "./notion.ts";
 import { rateLimitValidation } from "./middlewares/rate-limit-middleware.ts";
 import { validateBasicAuth } from "./middlewares/basic-auth-middleware.ts";
+import { visitCounter } from "./middlewares/visit-middleware.ts";
 
 const NOTION_DATABASE_ID = Deno.env.get("NOTION_DATABASE_ID");
 
@@ -18,7 +19,7 @@ if (!Deno.env.get("ADMIN_USERNAME") || !Deno.env.get("ADMIN_PASSWORD")) {
 const app = new Hono();
 // Serve static files
 app.use('/assets/*', serveStatic({ root: './public' }));
-app.get("/xmas", (c) => c.html(Deno.readTextFileSync("index.html")));
+app.get("/xmas", visitCounter("xmas_card_form_view"), (c) => c.html(Deno.readTextFileSync("index.html")));
 app.get(
   "/xmas/santa-stamp-150-200.png",
   (c) => c.body(Deno.readFileSync("santa-stamp-150-200.png")),
@@ -122,8 +123,11 @@ app.get("/xmas/stats", validateBasicAuth, async (c) => {
 
     const countKey = ["submissions_count"];
     await kv.set(countKey, count);
+    const [xMasCardVisit] = await kv.getMany([
+    ["visits", "xmas_card_form_view"]
+  ]); 
 
-    return c.json({ totalSubmissions: count });
+    return c.json({ totalSubmissions: count, xMasCardVisitCount: xMasCardVisit.value });
   } catch (error) {
     console.error("Error fetching stats:", error);
     return c.text("Internal Server Error", 500);
