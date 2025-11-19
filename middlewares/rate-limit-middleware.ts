@@ -5,11 +5,9 @@ const kv = await Deno.openKv();
 
 export function rateLimitValidation(actionKey: string) {
   return async (c, next) => {
-    console.log("Performing rate limit validation...");
     const ip = getConnInfo(c)?.remote?.address || "unknown";
     const rateLimitKey = ["rate_limit", actionKey, ip];
     let rateLimitUsage = (await kv.get<number>(rateLimitKey)).value ?? 0;
-    console.log(`Current rate limit usage for ${ip}: ${rateLimitUsage}/${RATE_LIMIT[actionKey]}`);
 
     if (rateLimitUsage >= RATE_LIMIT[actionKey]) {
       console.log(`Rate limit exceeded for IP: ${ip}`);

@@ -146,6 +146,10 @@ app.get("/api/xmas/reset-rate-limit", validateBasicAuth, async (c) => {
   }
 });
 
+app.notFound((c) => {
+  return c.html(Deno.readTextFileSync("404.html"), 404);
+});
+
 async function incrementTrackerCount(trackerKey: string[]): Promise<number> {
   let newCount = ((await kv.get<number>(trackerKey)).value ?? 0) + 1;
   await kv.set(trackerKey, newCount);
