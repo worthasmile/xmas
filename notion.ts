@@ -37,3 +37,44 @@ export async function createNotionPage(
 
   return await response.json();
 }
+
+export async function queryNotionDatabase(databaseId: string) {
+  if (!NOTION_API_KEY) {
+    console.error("NOTION_API_KEY must be set as an environment variable.");
+    return { results: [] };
+  }
+
+  let results: any[] = [];
+  let next_cursor: string | undefined = undefined;
+
+  do {
+    const url = `${NOTION_API_BASE_URL}/databases/${databaseId}/query`;
+    const headers = {
+      "Content-Type": "application/json",
+      "Notion-Version": "2022-06-28",
+      Authorization: `Bearer ${NOTION_API_KEY}`,
+    };
+
+    const body: any = { page_size: 100 };
+    if (next_cursor) {
+      body.start_cursor = next_cursor;
+    }
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Failed to query Notion database: ${error.message}`);
+    }
+
+    const data = await response.json();
+    results = results.concat(data.results);
+    next_cursor = data.next_cursor;
+  } while (next_cursor);
+
+  return { results };
+}

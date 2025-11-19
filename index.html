@@ -7,7 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="m-0 flex h-full items-center justify-center bg-gray-100 p-0">
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 sm:top-5 sm:right-5 sm:left-auto sm:transform-none p-4 rounded-md text-white transition-opacity duration-300 opacity-0 z-50 bg-gray-800">
+    <div
+      id="toast"
+      class="fixed top-5 left-1/2 -translate-x-1/2 sm:top-5 sm:right-5 sm:left-auto sm:transform-none p-4 rounded-md text-white transition-opacity duration-300 opacity-0 z-50 bg-gray-800"
+    >
       <p id="toast-message"></p>
     </div>
     <!-- Postcard Container: Increased max-width for two columns -->
@@ -42,11 +45,20 @@
             class="flex h-64 items-center justify-center border-gray-400 p-1 text-center"
           >
             <p class="select-none text-gray-500">
-              A tiny Christmas project to bring back the joy of handwritten postcards. Using the vintage Indian yellow postcard, I'll create a hand-painted Christmas card and mail it to you or someone you care about. No cost at all - just a bit of warmth, art, nostalgia, and hopefully a smile delivered.
+              A tiny Christmas project to bring back the joy of handwritten
+              postcards. Using the vintage Indian yellow postcard, I'll create a
+              hand-painted Christmas card and mail it to you or someone you care
+              about. No cost at all - just a bit of warmth, art, nostalgia, and
+              hopefully a smile delivered.
             </p>
           </div>
           <div class="text-center mt-1">
-            <a href="https://www.buymeacoffee.com/sha" target="_blank" rel="noopener noreferrer" class="inline-block text-gray-500 font-bold py-2 px-4 border-gray-500 border-dotted border-2 transition duration-200 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-900">
+            <a
+              href="https://www.buymeacoffee.com/sha"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-block text-gray-500 font-bold py-2 px-4 border-gray-500 border-dotted border-2 transition duration-200 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-900"
+            >
               Read More
             </a>
           </div>
@@ -54,6 +66,7 @@
 
         <!-- RIGHT COLUMN: Address, PIN, and Sender Details -->
         <form
+          autocomplete="on"
           class="w-full space-y-2 pt-4 md:w-1/2 md:border-l-2 md:border-gray-400 md:pt-0 md:pl-6"
         >
           <h2
@@ -74,6 +87,7 @@
               type="text"
               name="recipient_address_1"
               placeholder="Address Line 1"
+              autocomplete="address-line1"
               required
               class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-gray-500 focus:outline-none"
             />
@@ -81,6 +95,7 @@
               type="text"
               name="recipient_address_2"
               placeholder="Address Line 2"
+              autocomplete="address-line2"
               required
               class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-gray-500 focus:outline-none"
             />
@@ -105,6 +120,7 @@
                 pattern="[0-9]"
                 title="Enter one digit"
                 required
+                inputmode="numeric"
                 class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-gray-500 focus:outline-none"
               />
               <input
@@ -114,6 +130,7 @@
                 pattern="[0-9]"
                 title="Enter one digit"
                 required
+                inputmode="numeric"
                 class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-gray-500 focus:outline-none"
               />
               <input
@@ -123,6 +140,7 @@
                 pattern="[0-9]"
                 title="Enter one digit"
                 required
+                inputmode="numeric"
                 class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-gray-500 focus:outline-none"
               />
               <input
@@ -132,6 +150,7 @@
                 pattern="[0-9]"
                 title="Enter one digit"
                 required
+                inputmode="numeric"
                 class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-gray-500 focus:outline-none"
               />
               <input
@@ -141,6 +160,7 @@
                 pattern="[0-9]"
                 title="Enter one digit"
                 required
+                inputmode="numeric"
                 class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-gray-500 focus:outline-none"
               />
               <input
@@ -150,6 +170,7 @@
                 pattern="[0-9]"
                 title="Enter one digit"
                 required
+                inputmode="numeric"
                 class="h-8 w-8 border border-gray-500 bg-transparent text-center text-lg focus:border-gray-500 focus:outline-none"
               />
             </div>
@@ -190,7 +211,11 @@
 
       function showToast(message, type = "success") {
         toastMessage.textContent = message;
-        toast.classList.remove("bg-green-500", "bg-red-500", "bg-gray-800");
+        toast.classList.remove(
+          "bg-green-500",
+          "bg-red-500",
+          "bg-gray-800",
+        );
         if (type === "success") {
           toast.classList.add("bg-green-500");
         } else {
@@ -212,7 +237,9 @@
         });
 
         input.addEventListener("keydown", (event) => {
-          if (event.key === "Backspace" && event.target.value.length === 0) {
+          if (
+            event.key === "Backspace" && event.target.value.length === 0
+          ) {
             if (index > 0) {
               pinInputs[index - 1].focus();
             }
@@ -242,7 +269,7 @@
         };
 
         try {
-          const response = await fetch("/", {
+          const response = await fetch("/api/xmas-cards", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -251,7 +278,10 @@
           });
 
           if (response.status === 429) {
-            showToast("You have submitted too many times. Please try again later.", "error");
+            showToast(
+              "You have submitted too many times. Please try again later.",
+              "error",
+            );
           } else if (response.ok) {
             const result = await response.json();
             console.log(result);
@@ -262,7 +292,10 @@
           }
         } catch (error) {
           console.error("Error submitting form:", error);
-          showToast("Our Santa is busy with some Xmas activities. Please try again.", "error");
+          showToast(
+            "Our Santa is busy with some Xmas activities. Please try again.",
+            "error",
+          );
         } finally {
           submitButton.disabled = false;
           submitButton.textContent = "Post";
