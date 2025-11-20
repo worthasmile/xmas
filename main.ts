@@ -27,6 +27,10 @@ app.get(
   (c) => c.html(Deno.readTextFileSync("index.html")),
 );
 app.get(
+  "/xmas/about",
+  (c) => c.html(Deno.readTextFileSync("about.html")),
+);
+app.get(
   "/xmas/santa-stamp-150-200.png",
   (c) => c.body(Deno.readFileSync("santa-stamp-150-200.png")),
 );
