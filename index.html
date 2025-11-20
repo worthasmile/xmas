@@ -4,17 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Post a vintage christmas card</title>
-    
+
     <!-- Favicons-->
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/favicon/apple-touch-icon.png"
+    >
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/assets/favicon/favicon-32x32.png"
+    >
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/assets/favicon/favicon-16x16.png"
+    >
     <link rel="manifest" href="/assets/favicon/site.webmanifest">
-    
+
     <!-- Open Graph -->
     <meta property="og:title" content="Post a vintage christmas card" />
-    <meta property="og:description" content="A small Christmas project bringing back handwritten postcards. I'll hand-paint a Christmas card on the vintage Indian yellow postcard and mail it for free - sharing warmth, nostalgia, and a little joy." />
-    <meta property="og:image" content="https://worthasmile.in/assets/img/worth-a-smile-xmas-postcard.jpg" />
+    <meta
+      property="og:description"
+      content="A small Christmas project bringing back handwritten postcards. I'll hand-paint a Christmas card on the vintage Indian yellow postcard and mail it for free - sharing warmth, nostalgia, and a little joy."
+    />
+    <meta
+      property="og:image"
+      content="https://worthasmile.in/assets/img/worth-a-smile-xmas-postcard.jpg"
+    />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://worthasmile.in/xmas" />
@@ -23,19 +43,36 @@
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Post a vintage christmas card" />
-    <meta name="twitter:description" content="A small Christmas project bringing back handwritten postcards. I'll hand-paint a Christmas card on the vintage Indian yellow postcard and mail it for free - sharing warmth, nostalgia, and a little joy." />
-    <meta name="twitter:image" content="https://worthasmile.in/assets/img/worth-a-smile-xmas-postcard.jpg" />
+    <meta
+      name="twitter:description"
+      content="A small Christmas project bringing back handwritten postcards. I'll hand-paint a Christmas card on the vintage Indian yellow postcard and mail it for free - sharing warmth, nostalgia, and a little joy."
+    />
+    <meta
+      name="twitter:image"
+      content="https://worthasmile.in/assets/img/worth-a-smile-xmas-postcard.jpg"
+    />
     <meta name="twitter:site" content="@yourhandle" />
 
     <!-- Google / Schema -->
     <meta itemprop="name" content="Post a vintage christmas card" />
-    <meta itemprop="description" content="A small Christmas project bringing back handwritten postcards. I'll hand-paint a Christmas card on the vintage Indian yellow postcard and mail it for free - sharing warmth, nostalgia, and a little joy." />
-    <meta itemprop="image" content="https://worthasmile.in/assets/img/worth-a-smile-xmas-postcard.jpg" />
-    
+    <meta
+      itemprop="description"
+      content="A small Christmas project bringing back handwritten postcards. I'll hand-paint a Christmas card on the vintage Indian yellow postcard and mail it for free - sharing warmth, nostalgia, and a little joy."
+    />
+    <meta
+      itemprop="image"
+      content="https://worthasmile.in/assets/img/worth-a-smile-xmas-postcard.jpg"
+    />
+
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="m-0 flex h-full items-center justify-center bg-gray-100 p-0">
+    <div id="loader-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" style="display: none;">
+      <svg class="animate-bounce h-16 w-16 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      </svg>
+    </div>
     <div
       id="toast"
       class="fixed top-5 left-1/2 -translate-x-1/2 sm:top-5 sm:right-5 sm:left-auto sm:transform-none p-4 rounded-md text-white transition-opacity duration-300 opacity-0 z-50 bg-gray-800"
@@ -135,14 +172,18 @@
               class="w-full border-b border-dashed border-gray-500 bg-transparent p-1 text-base focus:border-gray-500 focus:outline-none"
             >
               <option value="" disabled selected>Select State</option>
-              <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+              <option value="Andaman and Nicobar Islands">
+                Andaman and Nicobar Islands
+              </option>
               <option value="Andhra Pradesh">Andhra Pradesh</option>
               <option value="Arunachal Pradesh">Arunachal Pradesh</option>
               <option value="Assam">Assam</option>
               <option value="Bihar">Bihar</option>
               <option value="Chandigarh">Chandigarh</option>
               <option value="Chhattisgarh">Chhattisgarh</option>
-              <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+              <option value="Dadra and Nagar Haveli and Daman and Diu">
+                Dadra and Nagar Haveli and Daman and Diu
+              </option>
               <option value="Delhi">Delhi</option>
               <option value="Goa">Goa</option>
               <option value="Gujarat">Gujarat</option>
@@ -313,10 +354,13 @@
         });
       });
 
+      const loaderOverlay = document.getElementById("loader-overlay");
+
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         submitButton.disabled = true;
         submitButton.textContent = "Checking with Santa...";
+        loaderOverlay.style.display = "flex";
 
         const formData = new FormData(form);
 
@@ -350,8 +394,13 @@
             );
           } else if (response.ok) {
             const result = await response.json();
-            console.log(result);
-            showToast("We have informed santa about your postcard!");
+
+            let message = (result.chancesOfGettingCard < 100)
+              ? `We have informed santa about your postcard! You have a ${result.chancesOfGettingCard}% chance of getting the card.`
+              : `We have informed santa about your postcard!`;
+
+            showToast(message);
+
             form.reset();
           } else {
             throw new Error("An unknown error occurred.");
@@ -365,6 +414,7 @@
         } finally {
           submitButton.disabled = false;
           submitButton.textContent = "Post";
+          loaderOverlay.style.display = "none";
         }
       });
     </script>

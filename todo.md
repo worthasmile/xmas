@@ -15,5 +15,5 @@
 - [ ] Add share button
 - [ ] Add stats UI page
 - [ ] Fix trailing / issue
-- [ ] Add loading overlay
-- [ ] Inform the chance for getting it delivered
+- [x] Add loading overlay
+- [x] Inform the chance for getting it delivered

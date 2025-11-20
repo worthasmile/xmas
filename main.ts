@@ -7,6 +7,8 @@ import { validateBasicAuth } from "./middlewares/basic-auth-middleware.ts";
 import { visitCounter } from "./middlewares/visit-middleware.ts";
 
 const NOTION_DATABASE_ID = Deno.env.get("NOTION_DATABASE_ID");
+const TOTAL_CARDS_PLANNED_TO_BE_SENT =
+  Deno.env.get("TOTAL_CARDS_PLANNED_TO_BE_SENT") || 150;
 
 const kv = await Deno.openKv();
 
@@ -18,103 +20,113 @@ if (!Deno.env.get("ADMIN_USERNAME") || !Deno.env.get("ADMIN_PASSWORD")) {
 
 const app = new Hono();
 // Serve static files
-app.use('/assets/*', serveStatic({ root: './public' }));
-app.get("/xmas", visitCounter("xmas_card_form_view"), (c) => c.html(Deno.readTextFileSync("index.html")));
+app.use("/assets/*", serveStatic({ root: "./public" }));
+app.get(
+  "/xmas",
+  visitCounter("xmas_card_form_view"),
+  (c) => c.html(Deno.readTextFileSync("index.html")),
+);
 app.get(
   "/xmas/santa-stamp-150-200.png",
   (c) => c.body(Deno.readFileSync("santa-stamp-150-200.png")),
 );
 
 // Handle form submission
-app.post("/api/xmas-cards", rateLimitValidation("xmas_postcard_submissions"), async (c) => {
-  try {
-    const ip = getConnInfo(c)?.remote?.address || "unknown";
+app.post(
+  "/api/xmas-cards",
+  rateLimitValidation("xmas_postcard_submissions"),
+  async (c) => {
+    try {
+      const ip = getConnInfo(c)?.remote?.address || "unknown";
 
-    const data = await c.req.json();
+      const data = await c.req.json();
 
-    // Store data in Notion
-    await createNotionPage(NOTION_DATABASE_ID, {
-      "Recipient Full Name": {
-        title: [
-          {
-            text: {
-              content: data.recipient_name || "N/A",
+      // Store data in Notion
+      await createNotionPage(NOTION_DATABASE_ID, {
+        "Recipient Full Name": {
+          title: [
+            {
+              text: {
+                content: data.recipient_name || "N/A",
+              },
             },
-          },
-        ],
-      },
-      "Recipient Address Line 1": {
-        rich_text: [
-          {
-            text: {
-              content: data.recipient_address_1 || "N/A",
-            },
-          },
-        ],
-      },
-      "Recipient Address Line 2": {
-        rich_text: [
-          {
-            text: {
-              content: data.recipient_address_2 || "N/A",
-            },
-          },
-        ],
-      },
-      "Recipient State": {
-        rich_text: [
-          {
-            text: {
-              content: data.recipient_state || "N/A",
-            },
-          },
-        ],
-      },
-      "Recipient PIN Code": {
-        rich_text: [
-          {
-            text: {
-              content: data.pin || "N/A",
-            },
-          },
-        ],
-      },
-      "Submission Date": {
-        date: {
-          start: new Date().toISOString(),
+          ],
         },
-      },
-      "Sender Name": {
-        rich_text: [
-          {
-            text: {
-              content: data.sender_name || "N/A",
+        "Recipient Address Line 1": {
+          rich_text: [
+            {
+              text: {
+                content: data.recipient_address_1 || "N/A",
+              },
             },
-          },
-        ],
-      },
-      "Sender IP Address": {
-        rich_text: [
-          {
-            text: {
-              content: ip,
+          ],
+        },
+        "Recipient Address Line 2": {
+          rich_text: [
+            {
+              text: {
+                content: data.recipient_address_2 || "N/A",
+              },
             },
+          ],
+        },
+        "Recipient State": {
+          rich_text: [
+            {
+              text: {
+                content: data.recipient_state || "N/A",
+              },
+            },
+          ],
+        },
+        "Recipient PIN Code": {
+          rich_text: [
+            {
+              text: {
+                content: data.pin || "N/A",
+              },
+            },
+          ],
+        },
+        "Submission Date": {
+          date: {
+            start: new Date().toISOString(),
           },
-        ],
-      },
-    });
+        },
+        "Sender Name": {
+          rich_text: [
+            {
+              text: {
+                content: data.sender_name || "N/A",
+              },
+            },
+          ],
+        },
+        "Sender IP Address": {
+          rich_text: [
+            {
+              text: {
+                content: ip,
+              },
+            },
+          ],
+        },
+      });
 
-    console.log(`New submission:`, data);
-    const totalSubmissions = await incrementTrackerCount([
-      "xmas_post_cards_total_submissions_count",
-    ]);
+      console.log(`New submission:`, data);
+      const totalSubmissions = await incrementTrackerCount([
+        "xmas_post_cards_total_submissions_count",
+      ]);
 
-    return c.json({ totalSubmissions });
-  } catch (error) {
-    console.error("Error processing form data:", error);
-    return c.text("Internal Server Error", 500);
-  }
-});
+      let chancesOfGettingCard = getChancesOfGettingCard(totalSubmissions);
+
+      return c.json({ chancesOfGettingCard });
+    } catch (error) {
+      console.error("Error processing form data:", error);
+      return c.text("Internal Server Error", 500);
+    }
+  },
+);
 
 app.get("/xmas/stats", validateBasicAuth, async (c) => {
   try {
@@ -124,10 +136,13 @@ app.get("/xmas/stats", validateBasicAuth, async (c) => {
     const countKey = ["submissions_count"];
     await kv.set(countKey, count);
     const [xMasCardVisit] = await kv.getMany([
-    ["visits", "xmas_card_form_view"]
-  ]); 
+      ["visits", "xmas_card_form_view"],
+    ]);
 
-    return c.json({ totalSubmissions: count, xMasCardVisitCount: xMasCardVisit.value });
+    return c.json({
+      totalSubmissions: count,
+      xMasCardVisitCount: xMasCardVisit.value,
+    });
   } catch (error) {
     console.error("Error fetching stats:", error);
     return c.text("Internal Server Error", 500);
@@ -158,6 +173,14 @@ async function incrementTrackerCount(trackerKey: string[]): Promise<number> {
   await kv.set(trackerKey, newCount);
 
   return newCount;
+}
+
+function getChancesOfGettingCard(submissionCount: number): number {
+  if (submissionCount <= TOTAL_CARDS_PLANNED_TO_BE_SENT) {
+    return 100;
+  } else {
+    return Math.floor((TOTAL_CARDS_PLANNED_TO_BE_SENT / submissionCount) * 100);
+  }
 }
 
 serve(app.fetch);
