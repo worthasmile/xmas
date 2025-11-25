@@ -22,6 +22,11 @@ const app = new Hono();
 // Serve static files
 app.use("/assets/*", serveStatic({ root: "./public" }));
 app.get(
+  "/",
+  visitCounter("homepage"),
+  (c) => c.html(Deno.readTextFileSync("index.html")),
+);
+app.get(
   "/xmas",
   visitCounter("xmas_card_form_view"),
   (c) => c.html(Deno.readTextFileSync("xmas.html")),
