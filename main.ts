@@ -24,7 +24,7 @@ app.use("/assets/*", serveStatic({ root: "./public" }));
 app.get(
   "/xmas",
   visitCounter("xmas_card_form_view"),
-  (c) => c.html(Deno.readTextFileSync("index.html")),
+  (c) => c.html(Deno.readTextFileSync("xmas.html")),
 );
 app.get(
   "/xmas/about",
